@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebProject</title>
+</head>
+<body>
+
+    <!-- HTML -->
+    <p>{{ text }}</p>
+    <button id = "flip-button">Toggle</button>
+    <button id = "screenshot" onclick="doScreenshot()">Screenshot</button>
+    <form action="/translate" method="POST">
+        <input type="text" id = "myText" name = "data">
+        <input type="submit" value="Translate">
+    </form>
+    <video autoplay></video>
+    <canvas class="d-none"></canvas> 
+    <img alt="">
+
+
+    <!-- SCRIPT -->
+
+    <script>
+        var front = false;
+        const canvas = document.querySelector('canvas');
+        const img = document.querySelector('img');
+        var video = document.querySelector('video');
+        const input_text = document.getElementById("myText");
+        document.getElementById('flip-button').onclick = function() { front = !front; };
+
+        var constraints = { 
+            video: { facingMode: (front? "user" : "environment") } 
+        };
+
+        navigator.mediaDevices.getUserMedia(constraints)
+        .then(function(mediaStream) {
+        
+        video.srcObject = mediaStream;
+        video.onloadedmetadata = function(e) {
+            video.play();
+        };
+        })
+        .catch(function(err) { console.log(err.name + ": " + err.message); });
+
+
+
+        const doScreenshot = () => {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            
+            var data = canvas.toDataURL('image/jpeg');
+            input_text.value = data
+        };
+    </script>
+</body>
+</html>
